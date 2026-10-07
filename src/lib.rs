@@ -253,7 +253,11 @@
 //!
 //! In addition to the structures themselves, the crate provides
 //! functions for converting them: see [`ConvertTo`]
-
+// Set up cargo clippy
+#![deny(clippy::all)]
+#![warn(clippy::pedantic)]
+#![warn(clippy::nursery)]
+#![warn(clippy::missing_errors_doc)]
 pub const DEFAULT_UNKNOWN_MESSAGE: &str = "unknown";
 pub const DEFAULT_EMPTY_MESSAGE: &str = "empty";
 pub mod metrics;
