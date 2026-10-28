@@ -14,7 +14,7 @@ impl From<LoadAvg> for LoadAverage {
 
 impl From<sysinfo::DiskUsage> for DiskUsage {
     fn from(value: sysinfo::DiskUsage) -> Self {
-        DiskUsage {
+        Self {
             read_bytes: value.read_bytes,
             written_bytes: value.written_bytes,
             total_read_bytes: value.total_read_bytes,

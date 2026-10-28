@@ -36,7 +36,7 @@ pub struct SystemInfo {
     /// Metric showing the average load on processor threads
     pub load_average: LoadAverage,
 }
-/// Load Average structure for `load_avg` field in [CpuListInfo]
+/// Load Average structure for `load_avg` field in [`CpuListInfo`]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Default, Debug, Clone)]
 pub struct LoadAverage {

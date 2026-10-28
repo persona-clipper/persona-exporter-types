@@ -92,12 +92,12 @@ pub enum ProcessStatus {
 
 impl fmt::Display for ProcessStatus {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 impl Default for ProcessInfo {
     fn default() -> Self {
-        ProcessInfo {
+        Self {
             name: DEFAULT_UNKNOWN_MESSAGE.to_string().parse().unwrap(),
             status: ProcessStatus::default(),
             disk_usage: DiskUsage::default(),

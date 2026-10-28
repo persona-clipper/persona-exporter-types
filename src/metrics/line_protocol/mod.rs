@@ -20,7 +20,8 @@ pub mod server;
 #[cfg(feature = "system")]
 pub mod system;
 
-pub fn unknown_or_value(v: &str) -> &str {
+#[must_use]
+pub const fn unknown_or_value(v: &str) -> &str {
     if v.is_empty() {
         crate::DEFAULT_UNKNOWN_MESSAGE
     } else {

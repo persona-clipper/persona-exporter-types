@@ -5,7 +5,7 @@ use sysinfo::Disk;
 
 impl From<&sysinfo::Disk> for StorageMountPointInfo {
     fn from(value: &Disk) -> Self {
-        StorageMountPointInfo {
+        Self {
             name: CompactString::from(value.name().to_string_lossy()),
             mount_point: CompactString::from(value.mount_point().to_string_lossy()),
             file_system: CompactString::from(value.file_system().to_string_lossy()),

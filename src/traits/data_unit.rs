@@ -1,6 +1,6 @@
 /// A list of various units of information measurement:
 /// bytes, kilobytes, megabytes, gigabytes, terabytes, petabytes.
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum DataUnit {
     Bytes,
     KiloBytes,
@@ -34,20 +34,24 @@ impl DataUnit {
     ///     assert_eq!(total_swap, 102400.0)
     /// }
     /// ```
+    #[must_use]
     pub fn as_bytes(&self) -> f64 {
         match self {
-            DataUnit::Bytes => 1.0,
-            DataUnit::KiloBytes => 1024.0,
-            DataUnit::MegaBytes => 1024.0 * 1024.0,
-            DataUnit::GigaBytes => 1024.0 * 1024.0 * 1024.0,
-            DataUnit::TeraBytes => 1024.0 * 1024.0 * 1024.0 * 1024.0,
-            DataUnit::PetaBytes => 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0,
+            Self::Bytes => 1.0,
+            Self::KiloBytes => 1024.0,
+            Self::MegaBytes => 1024.0 * 1024.0,
+            Self::GigaBytes => 1024.0 * 1024.0 * 1024.0,
+            Self::TeraBytes => 1024.0 * 1024.0 * 1024.0 * 1024.0,
+            Self::PetaBytes => 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0,
         }
     }
 }
 
-fn convert_from_to(data: f64, from: DataUnit, to: DataUnit) -> f64 {
-    let bytes = data * from.as_bytes();
+fn convert_from_to<T>(data: T, from: DataUnit, to: DataUnit) -> f64
+where
+    f64: From<T>
+{
+    let bytes = f64::from(data) * from.as_bytes();
     bytes / to.as_bytes()
 }
 /// Data conversion between different units of measurement
@@ -61,7 +65,7 @@ fn convert_from_to(data: f64, from: DataUnit, to: DataUnit) -> f64 {
 /// use persona_exporter_types::types::{DataUnit, ConvertTo};
 ///
 /// fn main() {
-///     let total_RAM = 16543600640u64;
+///     let total_RAM: u64 = 16543600640;
 ///     let gigabytes_RAM = total_RAM
 ///         .to_dataunit(
 ///             DataUnit::Bytes,
@@ -72,7 +76,8 @@ fn convert_from_to(data: f64, from: DataUnit, to: DataUnit) -> f64 {
 /// }
 /// ```
 pub trait ConvertTo {
-    fn to_dataunit(self, from: DataUnit, to: DataUnit) -> f64;
+    #[must_use]
+    fn to_dataunit(self, from: DataUnit, to: DataUnit) -> Self;
 }
 
 macro_rules! insert_convert_to_impl {
@@ -81,12 +86,15 @@ macro_rules! insert_convert_to_impl {
             impl ConvertTo for $t {
                 #[doc = concat!["Converting a value of type **", stringify!($t), "** from one unit to another" ]]
                 /// For more information about conversition, see [`ConvertTo`]
-                fn to_dataunit(self, from: DataUnit, to: DataUnit) -> f64 {
-                    convert_from_to(self as f64, from, to)
+                #[inline]
+                #[allow(clippy::cast_possible_truncation)]
+                #[allow(clippy::cast_sign_loss)]
+                fn to_dataunit(self, from: DataUnit, to: DataUnit) -> Self {
+                    convert_from_to(self, from, to) as $t
                 }
             }
         )*
     };
 }
 
-insert_convert_to_impl!(u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64);
+insert_convert_to_impl!(u8, u16, u32, i8, i16, i32, f32, f64);

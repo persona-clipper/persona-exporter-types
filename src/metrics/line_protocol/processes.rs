@@ -25,8 +25,8 @@ impl FromWithMeasurement<&ProcessInfo> for LineProtocolBuilder<Vec<u8>, AfterFie
                 "disk_usage.total_written_bytes",
                 value.disk_usage.total_written_bytes,
             )
-            .field("cpu_usage.per_thread", value.cpu_usage_per_thread as f64)
-            .field("cpu_usage.global", value.global_cpu_usage as f64)
+            .field("cpu_usage.per_thread", f64::from(value.cpu_usage_per_thread))
+            .field("cpu_usage.global", f64::from(value.global_cpu_usage))
             .field("memory_usage", value.memory_usage)
             .field("virtual_memory", value.virtual_memory)
             .field("run_time", value.run_time)

@@ -6,26 +6,26 @@ use sysinfo::Process;
 use sysinfo::ProcessStatus as SysProcessStatus;
 
 pub trait FromWithNormalizeCpu<T> {
-    fn from_with_cpu(value: T, cpu_thread_count: f32) -> Self;
+    fn from_with_cpu(value: T, cpu_thread_count: usize) -> Self;
 }
 
 impl From<SysProcessStatus> for ProcessStatus {
     fn from(value: SysProcessStatus) -> Self {
         match value {
-            SysProcessStatus::Idle => ProcessStatus::Idle,
-            SysProcessStatus::Run => ProcessStatus::Run,
-            SysProcessStatus::Sleep => ProcessStatus::Sleep,
-            SysProcessStatus::Stop => ProcessStatus::Stop,
-            SysProcessStatus::Zombie => ProcessStatus::Zombie,
-            SysProcessStatus::Tracing => ProcessStatus::Tracing,
-            SysProcessStatus::Dead => ProcessStatus::Dead,
-            SysProcessStatus::Wakekill => ProcessStatus::Wakekill,
-            SysProcessStatus::Waking => ProcessStatus::Waking,
-            SysProcessStatus::Parked => ProcessStatus::Parked,
-            SysProcessStatus::LockBlocked => ProcessStatus::LockBlocked,
-            SysProcessStatus::UninterruptibleDiskSleep => ProcessStatus::UninterruptibleDiskSleep,
-            SysProcessStatus::Suspended => ProcessStatus::Suspended,
-            _ => ProcessStatus::Unknown,
+            SysProcessStatus::Idle => Self::Idle,
+            SysProcessStatus::Run => Self::Run,
+            SysProcessStatus::Sleep => Self::Sleep,
+            SysProcessStatus::Stop => Self::Stop,
+            SysProcessStatus::Zombie => Self::Zombie,
+            SysProcessStatus::Tracing => Self::Tracing,
+            SysProcessStatus::Dead => Self::Dead,
+            SysProcessStatus::Wakekill => Self::Wakekill,
+            SysProcessStatus::Waking => Self::Waking,
+            SysProcessStatus::Parked => Self::Parked,
+            SysProcessStatus::LockBlocked => Self::LockBlocked,
+            SysProcessStatus::UninterruptibleDiskSleep => Self::UninterruptibleDiskSleep,
+            SysProcessStatus::Suspended => Self::Suspended,
+            _ => Self::Unknown,
         }
     }
 }
@@ -63,18 +63,14 @@ impl From<SysProcessStatus> for ProcessStatus {
 // }
 
 impl FromWithNormalizeCpu<&Process> for ProcessInfo {
-    fn from_with_cpu(value: &Process, cpu_thread_count: f32) -> Self {
+    fn from_with_cpu(value: &Process, cpu_thread_count: usize) -> Self {
         let uid = value
-            .user_id()
-            .map(|id| id.to_compact_string())
-            .unwrap_or_else(|| DEFAULT_UNKNOWN_MESSAGE.to_compact_string());
+            .user_id().map_or_else(|| DEFAULT_UNKNOWN_MESSAGE.to_compact_string(), |id| id.to_compact_string());
         let gid = value
-            .group_id()
-            .map(|id| id.to_compact_string())
-            .unwrap_or_else(|| DEFAULT_UNKNOWN_MESSAGE.to_compact_string());
+            .group_id().map_or_else(|| DEFAULT_UNKNOWN_MESSAGE.to_compact_string(), |id| id.to_compact_string());
         // .unwrap_or_else(|| DEFAULT_UNKNOWN_MESSAGE.to_compact_string());
 
-        ProcessInfo {
+        Self {
             name: value
                 .name()
                 .to_str()
@@ -84,7 +80,7 @@ impl FromWithNormalizeCpu<&Process> for ProcessInfo {
             disk_usage: DiskUsage::from(value.disk_usage()),
             program_id: value.pid().to_compact_string(),
             cpu_usage_per_thread: value.cpu_usage(),
-            global_cpu_usage: value.cpu_usage() / cpu_thread_count,
+            global_cpu_usage: value.cpu_usage() / cpu_thread_count as f32,
             memory_usage: value.memory(),
             virtual_memory: value.virtual_memory(),
             run_time: value.run_time(),
@@ -98,15 +94,11 @@ impl FromWithNormalizeCpu<&Process> for ProcessInfo {
 impl From<&Process> for ProcessInfo {
     fn from(value: &Process) -> Self {
         let uid = value
-            .user_id()
-            .map(|id| id.to_compact_string())
-            .unwrap_or_else(|| DEFAULT_UNKNOWN_MESSAGE.to_compact_string());
+            .user_id().map_or_else(|| DEFAULT_UNKNOWN_MESSAGE.to_compact_string(), |id| id.to_compact_string());
         let gid = value
-            .group_id()
-            .map(|id| id.to_compact_string())
-            .unwrap_or_else(|| DEFAULT_UNKNOWN_MESSAGE.to_compact_string());
+            .group_id().map_or_else(|| DEFAULT_UNKNOWN_MESSAGE.to_compact_string(), |id| id.to_compact_string());
 
-        ProcessInfo {
+        Self {
             name: value
                 .name()
                 .to_str()

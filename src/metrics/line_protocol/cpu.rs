@@ -11,7 +11,7 @@ impl FromWithMeasurement<&CpuThreadInfo> for LineProtocolBuilder<Vec<u8>, AfterF
             .insert_global_tags(global_tags)
             .tag("os_name", &value.os_name)
             .field("frequency", value.frequency)
-            .field("usage", value.cpu_usage as f64)
+            .field("usage", f64::from(value.cpu_usage))
     }
 }
 
